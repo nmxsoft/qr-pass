@@ -6,7 +6,7 @@
   <div class="card-header">
   <form method="post" action="
       {% if is_edit %}
-        {% url 'passes:edit' nick %}
+        {% url 'passes:edit' id_user %}
       {% else %}
         {% url 'passes:create' %}
       {% endif %}">
@@ -27,6 +27,7 @@
     <tr>
       <th scope="col">Ник</th>
       <th scope="col">Полное имя</th>
+      <th scope="col">Фото</th>
       <th scope="col">Доступ</th>
       <th scope="col">Получить QR</th>
       <th scope="col">Редактировать</th>
@@ -39,6 +40,13 @@
       <td>{{ v.username }}</td>
       <td>{{ v.real_name }}</td>
       <td>
+          {% if v.photo %}
+            <a href="{% url 'passes:view_photo' v.pk %}" type="button" class="btn btn-light">Показать</a>
+          {% else %}
+            <a href="{% url 'passes:add_photo' v.pk %}" type="button" class="btn btn-secondary">Загрузить</a>
+          {% endif %}
+      </td>
+      <td>
           {% if v.access == True %}
             <span style="color:green;">ДОСТУП РАЗРЕШЕН</span>
           {% else %}
@@ -49,10 +57,10 @@
           <a href="{% url 'passes:get_qr' v.pk %}" type="button" class="btn btn-info">QR</a>
       </td>
       <td>
-          <a href="{% url 'passes:edit' v.username %}" type="button" class="btn btn-primary">Редактировать</a>
+          <a href="{% url 'passes:edit' v.pk %}" type="button" class="btn btn-primary">Редактировать</a>
       </td>
       <td>
-          <a href="{% url 'passes:delete' v.username %}"  type="button" class="btn btn-danger">Удалить</a>
+          <a href="{% url 'passes:delete' v.pk %}"  type="button" class="btn btn-danger">Удалить</a>
       </td>
     </tr>
   {% endfor %}

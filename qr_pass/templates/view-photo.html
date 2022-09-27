@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col d-flex justify-content-center">
+  <div class="card text-white text-center bg-success mb-3" style="max-width: 36rem;">
+
+    <div class="card text-center">
+      <div class="card" style="width: 18rem; align: center">
+        <img src="/media/{{ img.photo }}" class="card-img-top" >
+        <div class="card-body">
+          <p class="card-text">{{ img.real_name }}</p>
+          <a href="{% url 'passes:add_photo' img.pk %}" class="btn btn-primary">Изменить фото</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock content %}

@@ -16,6 +16,13 @@ class Customer(models.Model):
         verbose_name='Реальное имя посетителя',
         blank=True
     )
+    photo = models.ImageField(
+        verbose_name='Фото',
+        upload_to='photo/',
+        blank=True,
+        default=None,
+        null=True
+    )
     access = models.BooleanField(
         default=False,
         verbose_name='Доступ'

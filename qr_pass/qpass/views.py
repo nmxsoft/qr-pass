@@ -1,7 +1,10 @@
 import datetime as dt
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import UpdateView
+from rest_framework.permissions import IsAuthenticated
 
 from qr_pass.settings import SEND_TELEGRAM_MESSAGE, BAD_KEY_ID, HOST_NAME
 from .forms import PassForm
@@ -42,8 +45,8 @@ def create(request):
 
 
 @login_required
-def edit(request, nick):
-    user = get_object_or_404(Customer, username=nick)
+def edit(request, id):
+    user = get_object_or_404(Customer, pk=id)
     if user.master == request.user:
         form = PassForm(
             request.POST or None,
@@ -59,16 +62,16 @@ def edit(request, nick):
             'var': var,
             'form': form,
             'is_edit': True,
-            'nick': nick
+            'nick': user.username,
+            'id_user': id
         }
         return render(request, template, context)
-    else:
-        return redirect('passes:index')
+    return redirect('passes:index')
 
 
 @login_required
-def delete(request, nick):
-    user = get_object_or_404(Customer, username=nick)
+def delete(request, id):
+    user = get_object_or_404(Customer, pk=id)
     if user.master == request.user:
         user.delete()
     return redirect('passes:index')
@@ -116,7 +119,8 @@ def check(request, key):
         send_message(message)
     context = {
         'access': user.access,
-        'name': user.real_name
+        'name': user.real_name,
+        'img': user.photo
     }
     return render(request, template, context)
 
@@ -129,3 +133,22 @@ def logs(request):
         'log': log,
     }
     return render(request, template, context)
+
+
+@login_required
+def view_photo(request, id):
+    img = get_object_or_404(Customer, pk=id)
+    template = 'view-photo.html'
+    return render(request, template, {'img': img})
+
+
+class PhotoUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required = (IsAuthenticated, )
+    model = Customer
+    template_name = "photo-new.html"
+    fields = ('photo',)
+
+
+@login_required
+def success(request):
+    return render(request, 'success.html')
