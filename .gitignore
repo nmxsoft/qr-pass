@@ -132,5 +132,4 @@ dmypy.json
 .idea
 
 #media
-media
-/media
+/qr_pass/media/photo/
