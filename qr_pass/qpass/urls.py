@@ -13,7 +13,7 @@ urlpatterns = [
     path('check/<str:key>/', views.check, name='check'),
     path('logs/', views.logs, name='logs'),
     re_path(r'add-photo/(?P<pk>[\d]+)/', PhotoUpdateView.as_view(
-        success_url='/success/'), name='add_photo'),
+        success_url='/'), name='add_photo'),
     path('view-photo/<int:id>/', views.view_photo, name='view_photo'),
-    path('success/', views.success, name='success'),
+    path('view-all', views.all_with_photo, name='all_photo'),
 ]

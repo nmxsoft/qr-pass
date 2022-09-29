@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card-group">
+<div class="row row-cols-3 row-cols-md-6 g-3">
+{% for a in all %}
+
+  <div class="col">
+  <div class="card text-black text-center bg-white mb-3" style="max-width: 36rem;">
+    <img src="/media/{{ a.photo }}" class="card-img-top" >
+    <div class="card-body">
+      <h5 class="card-title">{{ a.real_name }}</h5>
+    </div>
+    <div class="card-footer">
+    <small class="text-muted">{{ a.username }}:
+      {% if a.access %}
+        <span style="color: green;"> Доступ разрешен </span>
+      {% else %}
+      <span style="color: red;"> Доступ запрещен </span>
+      {% endif %}
+    </small>
+    </div>
+  </div>
+  </div>
+
+{% endfor %}
+</div>
+</div>
+{% endblock content %}

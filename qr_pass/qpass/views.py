@@ -2,6 +2,7 @@ import datetime as dt
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import UpdateView
 from rest_framework.permissions import IsAuthenticated
@@ -150,5 +151,8 @@ class PhotoUpdateView(PermissionRequiredMixin, UpdateView):
 
 
 @login_required
-def success(request):
-    return render(request, 'success.html')
+def all_with_photo(request):
+    all_customers = Customer.objects.filter(
+        master=request.user
+    ).exclude(Q(photo=None) | Q(photo__exact='')).order_by('username')
+    return render(request, 'all.html', {'all': all_customers})
