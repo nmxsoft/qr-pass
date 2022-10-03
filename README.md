@@ -6,4 +6,4 @@ Application for QR access
 о посещении через telegram-bot
 
 Стек: 
-Python, Django
+Python, Django, DRF
