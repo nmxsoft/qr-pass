@@ -1,11 +1,10 @@
 import datetime as dt
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import UpdateView
-from rest_framework.permissions import IsAuthenticated
 
 from qr_pass.settings import SEND_TELEGRAM_MESSAGE, BAD_KEY_ID, HOST_NAME
 from .forms import PassForm
@@ -143,8 +142,7 @@ def view_photo(request, id):
     return render(request, template, {'img': img})
 
 
-class PhotoUpdateView(PermissionRequiredMixin, UpdateView):
-    permission_required = (IsAuthenticated, )
+class PhotoUpdateView(LoginRequiredMixin, UpdateView):
     model = Customer
     template_name = "photo-new.html"
     fields = ('photo',)
