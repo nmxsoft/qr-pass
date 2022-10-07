@@ -112,6 +112,7 @@ def check(request, key):
     )
     if SEND_TELEGRAM_MESSAGE:
         send_message(message)
+
     if user.access:
         return Response({'access': True, 'user': user.real_name},
                         status=status.HTTP_200_OK)

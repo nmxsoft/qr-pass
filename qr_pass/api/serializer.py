@@ -25,10 +25,16 @@ class CustomerViewSerializer(serializers.ModelSerializer):
         return new_rec
 
 
+class RealNameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Customer
+        fields = ('real_name', 'username')
+
+
 class LogsViewSerializer(serializers.ModelSerializer):
+    user = RealNameSerializer()
 
     class Meta:
         model = Logs
         fields = '__all__'
-
-
