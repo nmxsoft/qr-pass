@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -64,3 +66,11 @@ class Logs(models.Model):
 
     class Meta:
         ordering = ('-visit',)
+
+
+class Device(models.Model):
+    dev_id = models.CharField(
+        verbose_name='ID устройства',
+        default=uuid.uuid4(),
+        max_length=128
+    )

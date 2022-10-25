@@ -1,4 +1,5 @@
 import datetime as dt
+import uuid
 
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
@@ -6,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from qpass.models import Customer, Logs
+from qpass.models import Customer, Logs, Device
 from qr_pass.settings import BAD_KEY_ID, HOST_NAME, SEND_TELEGRAM_MESSAGE
 from qpass.telegram import send_message
 from .serializer import CustomerViewSerializer, LogsViewSerializer
@@ -118,3 +119,11 @@ def check(request, key):
                         status=status.HTTP_200_OK)
     return Response({'access': False, 'user': user.real_name},
                     status=status.HTTP_200_OK)
+
+
+@api_view(['get'])
+@permission_classes([IsAuthenticated])
+def get_dev_id(request):
+    dev_id = str(uuid.uuid4())
+    Device.objects.create(dev_id=dev_id)
+    return Response({'dev_id': dev_id})

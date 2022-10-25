@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Customer, Logs
+from .models import Customer, Logs, Device
 
 
 @admin.register(Customer)
@@ -22,4 +22,12 @@ class LogsRegister(admin.ModelAdmin):
         'user',
         'visit',
         'success',
+    )
+
+
+@admin.register(Device)
+class DeviceRegister(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'dev_id',
     )
