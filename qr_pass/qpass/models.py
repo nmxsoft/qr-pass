@@ -74,3 +74,7 @@ class Device(models.Model):
         default=uuid.uuid4(),
         max_length=128
     )
+    create_time = models.DateTimeField(
+        verbose_name='Дата, время создания id',
+        auto_now_add=True
+    )

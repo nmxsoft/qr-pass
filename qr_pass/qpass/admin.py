@@ -30,4 +30,5 @@ class DeviceRegister(admin.ModelAdmin):
     list_display = (
         'id',
         'dev_id',
+        'create_time'
     )

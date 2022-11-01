@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from qpass.models import Customer, Logs, Device
+from .permissions import IsSuperUser
 from qr_pass.settings import BAD_KEY_ID, HOST_NAME, SEND_TELEGRAM_MESSAGE
 from qpass.telegram import send_message
 from .serializer import CustomerViewSerializer, LogsViewSerializer
@@ -87,42 +88,51 @@ def get_qr(request, id):
 @api_view(['get'])
 @permission_classes([IsAuthenticated])
 def check(request, key):
-    try:
-        user = get_object_or_404(Customer, key=key)
-    except Exception:
-        if SEND_TELEGRAM_MESSAGE:
-            send_message(
-                f'Попытка использовать неверный код: {key} в: '
-                f'{str(dt.datetime.now())[:-7]}'
+    if 'dev_id' in request.data:
+        if Device.objects.filter(dev_id=request.data['dev_id']).exists():
+            try:
+                user = get_object_or_404(Customer, key=key)
+            except Exception:
+                if SEND_TELEGRAM_MESSAGE:
+                    send_message(
+                        f'Попытка использовать неверный код: {key} в: '
+                        f'{str(dt.datetime.now())[:-7]}'
+                    )
+                user = get_object_or_404(Customer, id=BAD_KEY_ID)
+                Logs.objects.create(
+                    user=user,
+                    success=False,
+                    visit=str(dt.datetime.now())[:-7]
+                )
+                return Response(f'Попытка использовать неверный код {key}',
+                                status=status.HTTP_400_BAD_REQUEST)
+            Logs.objects.create(user=user, success=user.access)
+            message = (
+                    'Доступ запросил: ' +
+                    str(user.real_name) +
+                    '(' + str(user) + '), ' +
+                    'получил доступ: ' + str(user.access) +
+                    ', в: ' + str(dt.datetime.now())[:-7]
             )
-        user = get_object_or_404(Customer, id=BAD_KEY_ID)
-        Logs.objects.create(
-            user=user,
-            success=False,
-            visit=str(dt.datetime.now())[:-7]
-        )
-        return Response(f'Попытка использовать неверный код {key}',
-                        status=status.HTTP_400_BAD_REQUEST)
-    Logs.objects.create(user=user, success=user.access)
-    message = (
-            'Доступ запросил: ' +
-            str(user.real_name) +
-            '(' + str(user) + '), ' +
-            'получил доступ: ' + str(user.access) +
-            ', в: ' + str(dt.datetime.now())[:-7]
-    )
-    if SEND_TELEGRAM_MESSAGE:
-        send_message(message)
+            if SEND_TELEGRAM_MESSAGE:
+                send_message(message)
 
-    if user.access:
-        return Response({'access': True, 'user': user.real_name},
-                        status=status.HTTP_200_OK)
-    return Response({'access': False, 'user': user.real_name},
-                    status=status.HTTP_200_OK)
+            if user.access:
+                return Response({'access': True,
+                                 'nick': user.username,
+                                 'user': user.real_name,
+                                 'photo': str(user.photo)},
+                                status=status.HTTP_200_OK)
+            return Response({'access': False,
+                             'nick': user.username,
+                             'user': user.real_name,
+                             'photo': str(user.photo)},
+                            status=status.HTTP_200_OK)
+    return Response('Устройство не опознано.')
 
 
 @api_view(['get'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsSuperUser])
 def get_dev_id(request):
     dev_id = str(uuid.uuid4())
     Device.objects.create(dev_id=dev_id)
